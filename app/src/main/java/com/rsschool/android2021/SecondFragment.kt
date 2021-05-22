@@ -1,5 +1,6 @@
 package com.rsschool.android2021
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ class SecondFragment : Fragment() {
 
     private var backButton: Button? = null
     private var result: TextView? = null
+    var listener: i_openFragment?=null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,23 +33,36 @@ class SecondFragment : Fragment() {
 
         result?.text = generate(min, max).toString()
 
+        listener?.setnumerForBack(result?.text.toString().toInt())
         backButton?.setOnClickListener {
-            // TODO: implement back
+            listener?.openFirstFragmentViaInteface(result?.text.toString().toInt()?:0)
         }
     }
 
     private fun generate(min: Int, max: Int): Int {
-        // TODO: generate random number
-        return 0
+        val rnds = (min..max).random()
+        return rnds
+    }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if(context is i_openFragment){
+            listener=context
+        }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        listener=null
+    }
     companion object {
 
         @JvmStatic
         fun newInstance(min: Int, max: Int): SecondFragment {
             val fragment = SecondFragment()
             val args = Bundle()
-
+            args.putInt(SecondFragment.MIN_VALUE_KEY, min)
+            args.putInt(SecondFragment.MAX_VALUE_KEY, max)
+            fragment.arguments = args
             // TODO: implement adding arguments
 
             return fragment
